@@ -5,10 +5,10 @@ let conn;
 
 function handleConnection() {
   conn = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "oraganic_masale",
+    host: "boeedsfwvbqgh4rbnrht-mysql.services.clever-cloud.com",
+    user: "uoppg4q7cmxqz6om",
+    password: "Rk6OamcT8Gn6JqArHM9C",
+    database: "boeedsfwvbqgh4rbnrht",
   });
 
   conn.connect((err) => {
@@ -16,7 +16,7 @@ function handleConnection() {
       console.error("❌ Error connecting to MySQL:", err);
       setTimeout(handleConnection, 2000); // Retry after 2 seconds
     } else {
-      console.log("✅ Connected to MySQL");
+      console.log("✅ Connected to Clever Cloud MySQL");
     }
   });
 
