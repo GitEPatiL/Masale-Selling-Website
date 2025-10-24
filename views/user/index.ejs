@@ -1,0 +1,803 @@
+<%- include("navbar.ejs") %>
+
+  <!-- Bootstrap 5 Hero Carousel -->
+  <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true"
+        aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+
+    <!-- Slides -->
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <% for(let i=0; i < info.length; i++) { %>
+          <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+            <img src="/uploads/<%= info[i].image %>" class="d-block w-100" alt="info<%= i+1 %>">
+            <div class="carousel-caption d-none d-md-block">
+              <h2>
+                <%= info[i].title %>
+              </h2>
+              <div class="mt-4">
+                <a href="/product">
+                  <button class="btn btn-warning btn-lg px-4 py-2">Shop Now</button>
+                </a>
+              </div>
+            </div>
+          </div>
+          <% } %>
+      </div>
+    </div>
+
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+  <!-- Bootstrap Carousel End -->
+
+  <!-- Products Section -->
+  <div class="product-slider__section-title">
+    <h1>Our Top Selling Products</h1>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <!-- <button class="product-slider__nav-btn product-slider__nav-left"><i class="fas fa-chevron-left"></i></button> -->
+
+      <div class="product-slider__wrapper" id="sliderWrapper">
+        <% for (let i of popular) { const variants=productVariants[i.product_id] || []; const
+          defaultVariant=variants[0]; %>
+          <div class="product-card">
+            <a href="/product_details/<%=i.product_id%>" class="text-decoration-none">
+              <div class="flip__container">
+                <div class="flip__flipper">
+                  <div class="flip__front">
+                    <img src="/uploads/<%= i.product_image_front %>" alt="<%= i.product_name %> Front">
+                  </div>
+                  <div class="flip__back">
+                    <img src="/uploads/<%= i.product_image_back %>" alt="<%= i.product_name %> Back">
+                  </div>
+                </div>
+              </div>
+
+              <div class="product-card__content">
+                <h5 class="text-danger">
+                  <%= i.product_name %>
+                </h5>
+
+                <!-- Dynamic Price Display -->
+                <p class="product-card__price text-warning fw-bold" id="priceDisplay_<%= i.product_id %>">
+                  ₹<%= defaultVariant ? defaultVariant.price.toFixed(2) : '0.00' %>
+                </p>
+            </a>
+            <!-- Variant Selector -->
+            <div class="product-card__quantity-selector">
+              <label class="form-label fw-medium">Choose Quantity:</label>
+              <select class="form-select variant-selector" data-product-id="<%= i.product_id %>"
+                onchange="updatePrice(this)">
+                <% variants.forEach(variant=> { %>
+                  <option value="<%= variant.price %>">
+                    <%= variant.weight %> - ₹<%= variant.price.toFixed(2) %>
+                  </option>
+                  <% }); %>
+              </select>
+            </div>
+
+            <!-- Add to Cart Button -->
+            <% if (req.session.user && req.session.user.user_id) { %>
+              <% if (cartProductIds.includes(i.product_id)) { %>
+                <button class="btn btn-secondary w-100" disabled>
+                  <i class="fas fa-check-circle me-1"></i>Already in Cart
+                </button>
+                <% } else { %>
+                  <a href="/product_details/<%= i.product_id %>"
+                    class="btn btn-warning w-100 <%= i.stockqty <= 0 ? 'disabled' : '' %>">
+                    Add to Cart
+                  </a>
+                  <% } %>
+                    <% } else { %>
+                      <button class="btn btn-outline-warning w-100" onclick="alert('Please Login Or Sign Up')"
+                        <%=i.stockqty <=0 ? 'disabled' : '' %>>
+                        Add to Cart
+                      </button>
+                      <% } %>
+          </div>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- <button class="product-slider__nav-btn product-slider__nav-right"><i class="fas fa-chevron-right"></i></button> -->
+  </div>
+  </div>
+
+
+  <!-- Categories Section -->
+  <div class="category-slider__title">
+    <h1>Shop By Categories</h1>
+  </div>
+
+  <div class="category-slider__container">
+    <button class="category-slider__nav-btn category-slider__nav-left"><i class="fas fa-chevron-left"></i></button>
+
+    <div class="category-slider__wrapper" id="categoriesWrapper">
+      <% for(let i of category) { %>
+        <div class="category-card">
+          <a href="/category_product/<%= i.category_id %>" class="text-decoration-none">
+            <img src="/uploads/<%= i.category_image || 'default.jpg' %>" alt="<%= i.category_name %>">
+            <h5>
+              <%= i.category_name %>
+            </h5>
+          </a>
+        </div>
+        <% } %>
+    </div>
+
+    <button class="category-slider__nav-btn category-slider__nav-right"><i class="fas fa-chevron-right"></i></button>
+  </div>
+
+
+
+  <!-- Why Choose Us Section -->
+  <section class="whychoose">
+    <div class="whychoose__bg"></div>
+    <div class="whychoose__heading">
+      <h1>Why Choose Our Homemade Masala?</h1>
+    </div>
+
+    <div class="container py-5">
+      <div class="row text-center g-4">
+        <!-- Feature Box 1 -->
+        <div class="col-sm-6 col-lg-3" data-aos="fade-up-left" data-aos-duration="1200">
+          <div class="whychoose__feature">
+            <div class="whychoose__icon mx-auto">
+              <i class="fas fa-home"></i>
+            </div>
+            <h4>100% Home Made</h4>
+            <p>Each batch is carefully prepared in our home kitchen with love and care.</p>
+          </div>
+        </div>
+
+        <!-- Feature Box 2 -->
+        <div class="col-sm-6 col-lg-3" data-aos="fade-up-left" data-aos-duration="1200">
+          <div class="whychoose__feature">
+            <div class="whychoose__icon mx-auto">
+              <i class="fas fa-ban"></i>
+            </div>
+            <h4>No Chemicals</h4>
+            <p>Pure spices with no artificial colors, preservatives, or additives.</p>
+          </div>
+        </div>
+
+        <!-- Feature Box 3 -->
+        <div class="col-sm-6 col-lg-3" data-aos="fade-up-left" data-aos-duration="1200">
+          <div class="whychoose__feature">
+            <div class="whychoose__icon mx-auto">
+              <i class="fas fa-history"></i>
+            </div>
+            <h4>Traditional Methods</h4>
+            <p>Time-honored techniques to preserve the authentic flavors of India.</p>
+          </div>
+        </div>
+
+        <!-- Feature Box 4 -->
+        <div class="col-sm-6 col-lg-3" data-aos="fade-up-left" data-aos-duration="1200">
+          <div class="whychoose__feature">
+            <div class="whychoose__icon mx-auto">
+              <i class="fas fa-mortar-pestle"></i>
+            </div>
+            <h4>Freshly Ground</h4>
+            <p>Spices are ground fresh in small batches to ensure maximum aroma.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews Section -->
+
+
+
+<!--Recipe of the month -->
+
+<section class="featured-recipes py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h1 class="recipe-title">
+          <span class="text-warning">Recipe</span> Of The Month
+        </h1>
+        <p class="lead text-muted">Discover our chef's special selections</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Recipe Card 1 -->
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm overflow-hidden recipe-card">
+            <div class="position-relative">
+              <img src="/images/<%-recipe[0].image%>" alt="Spiced Chicken Curry"
+                class="img-fluid recipe-image">
+            </div>
+            <div class="card-body">
+              <h3 class="h4 card-title"><%-recipe[0].title%></h3>
+              <p class="card-text text-muted"><%-recipe[0].description%></p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-light text-dark"><i class="bi bi-clock"></i><%-recipe[0].duration%></span>
+                <a href="/recipes"><button class="recipe-btn">View Recipe</button></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recipe Card 2 -->
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm overflow-hidden recipe-card">
+            <div class="position-relative">
+              <img src="/images/<%-recipe[1].image%>"
+                alt="Paneer Masala" class="img-fluid recipe-image">
+            </div>
+            <div class="card-body">
+              <h3 class="h4 card-title"><%-recipe[1].title%></h3>
+              <p class="card-text text-muted"><%-recipe[1].description%></p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-light text-dark"><i class="bi bi-clock"></i><%-recipe[1].duration%></span>
+                <a href="/recipes"><button class="recipe-btn">View Recipe</button></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recipe Card 3 -->
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm overflow-hidden recipe-card">
+            <div class="position-relative">
+              <img src="/images/<%-recipe[2].image%>"
+                alt="Maswadi" class="img-fluid recipe-image">
+            </div>
+            <div class="card-body">
+              <h3 class="h4 card-title"><%-recipe[2].title%></h3>
+              <p class="card-text text-muted"><%-recipe[2].description%></p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-light text-dark"><i class="bi bi-clock"></i><%-recipe[2].duration%></span>
+                <a href="/recipes"><button class="recipe-btn">View Recipe</button></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <a href="/recipes"><button class="viewrecipe-btn btn-lg px-4">View All Recipes</button></a>
+
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="text-center">
+            <div class="logo">
+              <i class="fa fa-leaf" style="color: #ff9933; font-size: 3.5rem"></i>
+            </div>
+            <h1>Oraganic masale</h1>
+            <p class="subtitle">
+              Authentic organic spices crafted with traditional recipes and a touch
+              of Marathi zaika
+            </p>
+
+
+          </div>
+
+          <div class="section-title_reel">Spice Story Reel</div>
+          <p style="text-align: center; margin-bottom: 20px; color: #7f5a2b">
+            Hover over any post to flip and see details
+          </p>
+
+          <div class="carousel-container-fluid">
+            <div class="instagram-carousel" id="carousel">
+              <!-- Post 1 -->
+              <div class="post-card">
+                <div class="post-inner">
+                  <div class="post-front">
+                    <div class="post-image" style="
+                    background-image: url('/images/<%-spice_story[0].image%>');
+                  "></div>
+                    <div class="post-info">
+                      <div class="post-header">
+                        <div class="profile-pic rounded-circle" style="margin-right: 15px;">
+                          <img class="rounded-circle" src="/images/<%-spice_story[0].image%>" width="60px" height="40px" />
+                        </div>
+                        <div>
+                          <strong><%-spice_story[0].title%></strong>
+                          <p>Homemade Garam Masala Blend</p>
+                        </div>
+                      </div>
+                      <div class="post-stats">
+                        <div>1.2K views</div>
+                        <div class="post-actions">
+                          <div class="post-action">
+                            <i class="fas fa-heart"></i> 245
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-comment"></i> 42
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-share-alt"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-back">
+                    <img class="zoomed-image"
+                      src="/images/<%-spice_story[0].image%>"
+                      alt="Garam Masala" style="background-size: contain" />
+                    <div class="post-caption">
+                      <p class="p-0 mb-2"><%-spice_story[0].description%></p>
+                    </div>
+                    <div class="brand-watermark"><%-spice_story[0].subheading%></div>
+                  </div>
+                </div>
+              </div>
+
+              
+              <div class="post-card">
+                <div class="post-inner">
+                  <div class="post-front">
+                    <div class="post-image" style="
+                    background-image: url('/images/<%-spice_story[1].image%>');
+                  "></div>
+                    <div class="post-info">
+                      <div class="post-header">
+                        <div class="profile-pic rounded-circle" style="margin-right: 15px;">
+                          <img class="rounded-circle" src="/images/<%-spice_story[1].image%>" width="60px" height="40px" />
+                        </div>
+                        <div>
+                          <strong><%-spice_story[1].title%></strong>
+                          <p>Homemade Garam Masala Blend</p>
+                        </div>
+                      </div>
+                      <div class="post-stats">
+                        <div>1.2K views</div>
+                        <div class="post-actions">
+                          <div class="post-action">
+                            <i class="fas fa-heart"></i> 245
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-comment"></i> 42
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-share-alt"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-back">
+                    <img class="zoomed-image"
+                      src="/images/<%-spice_story[1].image%>"
+                      alt="Garam Masala" style="background-size: contain" />
+                    <div class="post-caption">
+                      <p class="p-0 mb-2"><%-spice_story[1].description%></p>
+                    </div>
+                    <div class="brand-watermark"><%-spice_story[1].subheading%></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="post-card">
+                <div class="post-inner">
+                  <div class="post-front">
+                    <div class="post-image" style="
+                    background-image: url('/images/<%-spice_story[2].image%>');
+                  "></div>
+                    <div class="post-info">
+                      <div class="post-header">
+                        <div class="profile-pic rounded-circle" style="margin-right: 15px;">
+                          <img class="rounded-circle" src="/images/<%-spice_story[2].image%>" width="60px" height="40px" />
+                        </div>
+                        <div>
+                          <strong><%-spice_story[2].title%></strong>
+                          <p>Homemade Garam Masala Blend</p>
+                        </div>
+                      </div>
+                      <div class="post-stats">
+                        <div>1.2K views</div>
+                        <div class="post-actions">
+                          <div class="post-action">
+                            <i class="fas fa-heart"></i> 245
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-comment"></i> 42
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-share-alt"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-back">
+                    <img class="zoomed-image"
+                      src="/images/<%-spice_story[2].image%>"
+                      alt="Garam Masala" style="background-size: contain" />
+                    <div class="post-caption">
+                      <p class="p-0 mb-2"><%-spice_story[2].description%></p>
+                    </div>
+                    <div class="brand-watermark"><%-spice_story[2].subheading%></div>
+                  </div>
+                </div>
+              </div>
+
+              
+
+              <div class="post-card">
+                <div class="post-inner">
+                  <div class="post-front">
+                    <div class="post-image" style="
+                    background-image: url('/images/<%-spice_story[3].image%>');
+                  "></div>
+                    <div class="post-info">
+                      <div class="post-header">
+                        <div class="profile-pic rounded-circle" style="margin-right: 15px;">
+                          <img class="rounded-circle" src="/images/<%-spice_story[3].image%>" width="60px" height="40px" />
+                        </div>
+                        <div>
+                          <strong><%-spice_story[3].title%></strong>
+                          <p>Homemade Garam Masala Blend</p>
+                        </div>
+                      </div>
+                      <div class="post-stats">
+                        <div>1.2K views</div>
+                        <div class="post-actions">
+                          <div class="post-action">
+                            <i class="fas fa-heart"></i> 245
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-comment"></i> 42
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-share-alt"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-back">
+                    <img class="zoomed-image"
+                      src="/images/<%-spice_story[3].image%>"
+                      alt="Garam Masala" style="background-size: contain" />
+                    <div class="post-caption">
+                      <p class="p-0 mb-2"><%-spice_story[3].description%></p>
+                    </div>
+                    <div class="brand-watermark"><%-spice_story[3].subheading%></div>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="post-card">
+                <div class="post-inner">
+                  <div class="post-front">
+                    <div class="post-image" style="
+                    background-image: url('/images/<%-spice_story[4].image%>');
+                  "></div>
+                    <div class="post-info">
+                      <div class="post-header">
+                        <div class="profile-pic rounded-circle" style="margin-right: 15px;">
+                          <img class="rounded-circle" src="/images/<%-spice_story[4].image%>" width="60px" height="40px" />
+                        </div>
+                        <div>
+                          <strong><%-spice_story[4].title%></strong>
+                          <p>Homemade Garam Masala Blend</p>
+                        </div>
+                      </div>
+                      <div class="post-stats">
+                        <div>1.2K views</div>
+                        <div class="post-actions">
+                          <div class="post-action">
+                            <i class="fas fa-heart"></i> 245
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-comment"></i> 42
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-share-alt"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-back">
+                    <img class="zoomed-image"
+                      src="/images/<%-spice_story[4].image%>"
+                      alt="Garam Masala" style="background-size: contain" />
+                    <div class="post-caption">
+                      <p class="p-0 mb-2"><%-spice_story[4].description%></p>
+                    </div>
+                    <div class="brand-watermark"><%-spice_story[4].subheading%></div>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <!-- Post 2 -->
+              <!-- <div class="post-card">
+                <div class="post-inner">
+                  <div class="post-front">
+                    <div class="post-image" style="
+                    background-image: url('https://rimaindustries.co.in/wp-content/uploads/2024/09/Kashmiri2.jpg');
+                  "></div>
+                    <div class="post-info">
+                      <div class="post-header">
+                        <div class="profile-pic" style="margin-right: 15px;">
+                          <img class="rounded-circle" src="public/images/logo2.jpg" width="60px" height="40px"
+                            style="border-radius: 30px;">
+                        </div>
+                        <div>
+                          <strong>Oragnic Masale</strong>
+                          <p>Freshly Ground Red Chili Powder</p>
+                        </div>
+                      </div>
+                      <div class="post-stats">
+                        <div>980 views</div>
+                        <div class="post-actions">
+                          <div class="post-action">
+                            <i class="fas fa-heart"></i> 312
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-comment"></i> 28
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-share-alt"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-back">
+                    <img class="zoomed-image"
+                      src="https://rimaindustries.co.in/wp-content/uploads/2024/09/Kashmiri2.jpg"
+                      alt="Red Chili Powder" />
+                    <div class="post-caption">
+                      <p>
+                        Pure Kashmiri chili powder with vibrant color and mild heat.
+                        Perfect for adding rich color to your dishes without
+                        overwhelming spice.
+                      </p>
+                    </div>
+                    <div class="brand-watermark">The Masala Basket</div>
+                  </div>
+                </div>
+              </div> -->
+
+              <!-- Post 3 -->
+              <!-- <div class="post-card">
+                <div class="post-inner">
+                  <div class="post-front">
+                    <div class="post-image" style="
+                    background-image: url('https://alopikas.com/assets/img/product/red-chilli-secondary-alopikas.webp');
+                  "></div>
+                    <div class="post-info">
+                      <div class="post-header">
+                        <div class="profile-pic" style="margin-right: 15px;">
+                          <img class="rounded-circle" src="public/images/logo2.jpg" width="60px" height="40px">
+                        </div>
+                        <div>
+                          <strong>Oragnic Masale</strong>
+                          <p>Homemade Pickle Collection</p>
+                        </div>
+                      </div>
+                      <div class="post-stats">
+                        <div>1.5K views</div>
+                        <div class="post-actions">
+                          <div class="post-action">
+                            <i class="fas fa-heart"></i> 421
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-comment"></i> 56
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-share-alt"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-back">
+                    <img class="zoomed-image"
+                      src="https://alopikas.com/assets/img/product/red-chilli-secondary-alopikas.webp"
+                      alt="Pickle Collection" />
+                    <div class="post-caption">
+                      <p>
+                        Traditional Indian pickles made with seasonal fruits and
+                        vegetables. Preserved using authentic family recipes handed
+                        down for generations.
+                      </p>
+                    </div>
+                    <div class="brand-watermark">The Masala Basket</div>
+                  </div>
+                </div>
+              </div> -->
+
+              <!-- Post 4 -->
+              <!-- <div class="post-card">
+                <div class="post-inner">
+                  <div class="post-front">
+                    <div class="post-image" style="
+                    background-image: url('https://www.gosupps.com/media/catalog/product/cache/25/image/1500x/040ec09b1e35df139433887a97daa66f/8/1/81aGrguDHML._SL1500_.jpg');
+                  "></div>
+                    <div class="post-info">
+                      <div class="post-header">
+                        <div class="profile-pic" style="margin-right: 15px;">
+                          <img class="rounded-circle" src="public/images/logo2.jpg" width="60px" height="40px">
+                        </div>
+                        <div>
+                          <strong>Oragnic Masale</strong>
+                          <p>Traditional Turmeric Powder</p>
+                        </div>
+                      </div>
+                      <div class="post-stats">
+                        <div>1.1K views</div>
+                        <div class="post-actions">
+                          <div class="post-action">
+                            <i class="fas fa-heart"></i> 387
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-comment"></i> 34
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-share-alt"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-back">
+                    <img class="zoomed-image"
+                      src="https://www.gosupps.com/media/catalog/product/cache/25/image/1500x/040ec09b1e35df139433887a97daa66f/8/1/81aGrguDHML._SL1500_.jpg"
+                      alt="Turmeric Powder" />
+                    <div class="post-caption">
+                      <p>
+                        Pure organic turmeric with high curcumin content. Sourced
+                        directly from farmers in Maharashtra and processed without
+                        additives.
+                      </p>
+                    </div>
+                    <div class="brand-watermark">The Masala Basket</div>
+                  </div>
+                </div>
+              </div> -->
+
+              <!-- Post 5 -->
+              <!-- <div class="post-card">
+                <div class="post-inner">
+                  <div class="post-front">
+                    <div class="post-image" style="
+                    background-image: url('https://assets.epicurious.com/photos/5f7b812544b4b8f1f7ddfba2/1:1/w_2560%2Cc_limit/CurryBlend_RECIPE_100320_0231.jpg');
+                  "></div>
+                    <div class="post-info">
+                      <div class="post-header">
+                        <div class="profile-pic" style="margin-right: 15px;">
+                          <img class="rounded-circle" src="public/images/logo2.jpg" width="55px" height="40px">
+                        </div>
+                        <div>
+                          <strong>Oragnic Masale</strong>
+                          <p>Special Curry Masala Blend</p>
+                        </div>
+                      </div>
+                      <div class="post-stats">
+                        <div>890 views</div>
+                        <div class="post-actions">
+                          <div class="post-action">
+                            <i class="fas fa-heart"></i> 278
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-comment"></i> 19
+                          </div>
+                          <div class="post-action">
+                            <i class="fas fa-share-alt"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-back">
+                    <img class="zoomed-image"
+                      src="https://assets.epicurious.com/photos/5f7b812544b4b8f1f7ddfba2/1:1/w_2560%2Cc_limit/CurryBlend_RECIPE_100320_0231.jpg"
+                      alt="Curry Masala" />
+                    <div class="post-caption">
+                      <p>
+                        Our aromatic curry blend with 15 spices. Perfect for
+                        creating rich, flavorful curries in minutes. Just add to
+                        sautéed onions and tomatoes.
+                      </p>
+                    </div>
+                    <div class="brand-watermark">The Masala Basket</div>
+                  </div>
+                </div>
+              </div> -->
+            </div>
+
+            <div class="reel_carousel_nav">
+              <button class="reel_nav_btn" onclick="scrollCarousel(-1)">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button class="reel_nav_btn" onclick="scrollCarousel(1)">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Hero Section with Spice Basket Animation -->
+  <section class="spice-hero-section">
+    <div class="spice-hero-content">
+      <div class="spice-hero-text">
+        <h1 class="spice-hero-title">Organic Masale</h1>
+        <p class="spice-hero-subtitle">
+          Authentic Indian Spices Handpicked from the Heart of India
+        </p>
+        <div class="spice-cta-buttons">
+          <a href="/product" class="text-decoration-none">
+            <button class="spice-cta-btn spice-shop-btn">
+              <i class="fas fa-shopping-cart"></i> Shop Now
+            </button>
+          </a>
+          <a href="https://wa.me/+919146848704" target="_blank" class="text-decoration-none">
+            <button class="spice-cta-btn spice-whatsapp-btn">
+              <i class="fab fa-whatsapp"></i> WhatsApp to Order
+            </button>
+          </a>
+        </div>
+      </div>
+
+      <div class="spice-hero-animation">
+        <div class="spice-basket-container">
+          <div class="spice-basket">
+            <div class="spice-basket-body"></div>
+            <div class="spice-basket-handle"></div>
+
+            <div class="spice-packet packet-1"><i class="fas fa-pepper-hot spice-icon"></i>
+              <div class="spice-label">CHILI</div>
+            </div>
+            <div class="spice-packet packet-2"><i class="fas fa-mortar-pestle spice-icon"></i>
+              <div class="spice-label">TURMERIC</div>
+            </div>
+            <div class="spice-packet packet-3"><i class="fas fa-seedling spice-icon"></i>
+              <div class="spice-label">CARDAMOM</div>
+            </div>
+            <div class="spice-packet packet-4"><i class="fas fa-leaf spice-icon"></i>
+              <div class="spice-label">BAY LEAF</div>
+            </div>
+            <div class="spice-packet packet-5"><i class="fas fa-fire-alt spice-icon"></i>
+              <div class="spice-label">GARAM MASALA</div>
+            </div>
+
+            <div class="spice-particles"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <%-include("footer.ejs")%>

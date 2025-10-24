@@ -1,0 +1,160 @@
+<%- include("navbar") %>
+
+<style>
+  body {
+    background-color: #fdfbf7;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .edit-wrapper {
+    max-width: 850px;
+    margin: 60px auto;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  }
+
+  .edit-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #5b4d9c;
+    margin-bottom: 30px;
+  }
+
+  .form-group {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .form-group .input-box {
+    flex: 1 1 48%;
+  }
+
+  .form-group input[type="text"],
+  .form-group textarea,
+  .form-group input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #5b4d9c;
+    box-shadow: 0 0 5px rgba(91, 77, 156, 0.2);
+  }
+
+  .image-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+  }
+
+  .image-preview {
+    flex: 1 1 48%;
+    text-align: center;
+  }
+
+  .image-preview img {
+    max-width: 150px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .submit-box {
+    flex: 1 1 48%;
+    text-align: center;
+  }
+
+  button {
+    background-color: #5b4d9c;
+    color: white;
+    padding: 12px 30px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #403373;
+  }
+
+  @media (max-width: 768px) {
+    .form-group .input-box,
+    .image-action-row {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .image-preview,
+    .submit-box {
+      flex: 1 1 100%;
+    }
+  }
+</style>
+
+<div class="edit-wrapper">
+  <h2 class="edit-title">Edit Mission Value</h2>
+
+  <form action="/admin/our_mission_value" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="<%= info[0].id %>">
+
+    <!-- Heading -->
+    <div class="form-group">
+      <div class="input-box">
+        <label>Heading</label>
+        <input type="text" name="title" value="<%= info[0].heading %>" required>
+      </div>
+
+      <div class="input-box">
+        <label>New Image (optional)</label>
+        <input type="file" name="image">
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <div class="input-box" style="flex: 1 1 100%;">
+        <label>Description</label>
+        <textarea name="description" rows="4" required><%= info[0].description %></textarea>
+      </div>
+    </div>
+
+    <!-- Image Preview & Update Button Side by Side -->
+    <div class="image-action-row">
+      <div class="image-preview">
+        <p>Current Image:</p>
+        <img src="/images/<%= info[0].image %>" alt="Mission Image">
+      </div>
+      <div class="submit-box">
+        <button type="submit">Update</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<%- include("footer") %>

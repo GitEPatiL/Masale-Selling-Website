@@ -1,0 +1,100 @@
+<%- include("navbar") %>
+
+<style>
+  body {
+    background-color: #fdfbf7;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .faq-edit-wrapper {
+    max-width: 700px;
+    margin: 70px auto;
+    background-color: #ffffff;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(91, 77, 156, 0.08);
+  }
+
+  .faq-edit-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #5b4d9c;
+    text-align: center;
+    margin-bottom: 30px;
+    background-color: #ebe6ff;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(91, 77, 156, 0.1);
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .form-control {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    padding: 10px 12px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #5b4d9c;
+    box-shadow: 0 0 0 3px rgba(91, 77, 156, 0.1);
+    outline: none;
+  }
+
+  .submit-btn {
+    background-color: #5b4d9c;
+    color: #fff;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+  }
+
+  .submit-btn:hover {
+    background-color: #403373;
+  }
+</style>
+
+<div class="faq-edit-wrapper">
+  <h2 class="faq-edit-title">Edit FAQ</h2>
+
+  <form action="/admin/update_faq" method="POST">
+    <input type="hidden" name="id" value="<%= result[0].id %>">
+
+    <label for="question" class="form-label">Question</label>
+    <input
+      type="text"
+      id="question"
+      name="question"
+      class="form-control"
+      value="<%= result[0].question %>"
+      required
+    >
+
+    <label for="answer" class="form-label">Answer</label>
+    <textarea
+      id="answer"
+      name="answer"
+      class="form-control"
+      rows="5"
+      required
+    ><%= result[0].answer %></textarea>
+
+    <button type="submit" class="submit-btn">Update</button>
+  </form>
+</div>
+
+<%- include("footer") %>
